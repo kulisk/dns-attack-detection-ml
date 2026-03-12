@@ -6,10 +6,9 @@ imbalance handling → model training → evaluation → persistence.
 """
 from __future__ import annotations
 
-import os
 import time
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -120,7 +119,28 @@ class ModelTrainer:
         X_test = test_df_s.values
 
         # ── 6. Imbalance handling (SMOTE on training only) ────────────
-        if use_smote and self.cfg.get("imbalance.strategy", "smote") == "smote":
+        unsupervised_model_names = {
+            "isolation_forest",
+            "one_class_svm",
+            "dbscan",
+            "autoencoder",
+        }
+        is_unsupervised = model.name in unsupervised_model_names
+
+        if is_unsupervised:
+            benign_label_idx = int(self.label_encoder.classes.index("benign"))
+            benign_mask = y_train == benign_label_idx
+            benign_count = int(benign_mask.sum())
+            if benign_count == 0:
+                raise ValueError("Unsupervised training requires benign samples, but none were found.")
+            X_train = X_train[benign_mask]
+            y_train = y_train[benign_mask]
+            logger.info(
+                "Unsupervised training uses benign-only subset",
+                extra={"benign_samples": benign_count},
+            )
+
+        if (not is_unsupervised) and use_smote and self.cfg.get("imbalance.strategy", "smote") == "smote":
             logger.info("Applying SMOTE …")
             X_train, y_train = self._apply_smote(X_train, y_train)
 
@@ -169,7 +189,7 @@ class ModelTrainer:
         self, X: np.ndarray, y: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray]:
         k = int(self.cfg.get("imbalance.k_neighbors", 5))
-        unique, counts = np.unique(y, return_counts=True)
+        _, counts = np.unique(y, return_counts=True)
         # Only SMOTE if every class has at least k+1 samples
         min_count = counts.min()
         if min_count <= k:

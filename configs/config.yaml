@@ -91,7 +91,7 @@ supervised:
     gamma: "scale"
     probability: true
     class_weight: "balanced"
-    max_iter: 1000
+    max_iter: 5000
 
   mlp:
     hidden_layers: [256, 128, 64]

@@ -35,7 +35,7 @@ class SVMDetector(BaseDetector):
         gamma: str = "scale",
         class_weight: str = "balanced",
         probability: bool = True,
-        max_iter: int = 1000,
+        max_iter: int = 5000,
         model_dir: str = "models",
     ) -> None:
         super().__init__(name="svm", model_dir=model_dir)

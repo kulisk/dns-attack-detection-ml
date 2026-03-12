@@ -84,15 +84,17 @@ def train(
 
     trainer = ModelTrainer(config_path=ctx.obj["config"], model_dir=model_dir)
     use_smote = not no_smote
+    unsupervised_models = (
+        "isolation_forest", "one_class_svm", "dbscan", "autoencoder"
+    )
+    supervised_models = (
+        "random_forest", "xgboost", "svm", "mlp", "lstm"
+    )
 
-    if unsupervised or model in (
-        "all", "isolation_forest", "one_class_svm", "dbscan", "autoencoder"
-    ):
+    if unsupervised or model in unsupervised_models:
         _train_unsupervised_models(trainer, model if model != "all" else "all", use_smote, model_dir)
 
-    if not unsupervised or model in (
-        "all", "random_forest", "xgboost", "svm", "mlp", "lstm"
-    ):
+    if not unsupervised and model in ("all", *supervised_models):
         _train_supervised_models(trainer, model if model != "all" else "all", use_smote, model_dir)
 
 

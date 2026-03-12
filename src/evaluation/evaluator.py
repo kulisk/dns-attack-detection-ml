@@ -88,7 +88,13 @@ class Evaluator:
         except Exception:
             y_proba = None
 
-        metrics = self._compute_metrics(y_true, y_pred, y_proba)
+        y_true_eval, y_pred_eval, y_proba_eval, eval_class_names = self._prepare_eval_arrays(
+            y_true,
+            y_pred,
+            y_proba,
+        )
+
+        metrics = self._compute_metrics(y_true_eval, y_pred_eval, y_proba_eval, eval_class_names)
         metrics["model"] = model.name
         metrics["split"] = split
 
@@ -102,9 +108,9 @@ class Evaluator:
             )
 
         # Plots
-        self._plot_confusion_matrix(y_true, y_pred, model.name, split)
-        if y_proba is not None:
-            self._plot_roc_curves(y_true, y_proba, model.name, split)
+        self._plot_confusion_matrix(y_true_eval, y_pred_eval, model.name, split, eval_class_names)
+        if y_proba_eval is not None:
+            self._plot_roc_curves(y_true_eval, y_proba_eval, model.name, split, eval_class_names)
         if hasattr(model, "feature_importances") and model.feature_names:
             self._plot_feature_importance(model, split)
 
@@ -160,8 +166,10 @@ class Evaluator:
         y_true: np.ndarray,
         y_pred: np.ndarray,
         y_proba: Optional[np.ndarray],
+        class_names: list[str],
     ) -> dict:
-        n_classes = len(self.class_names)
+        n_classes = len(class_names)
+        labels = list(range(n_classes))
         roc_auc = 0.0
         if y_proba is not None and n_classes > 1:
             try:
@@ -183,14 +191,42 @@ class Evaluator:
             "f1_weighted": float(f1_score(y_true, y_pred, average="weighted", zero_division=0)),
             "f1_macro": float(f1_score(y_true, y_pred, average="macro", zero_division=0)),
             "roc_auc": roc_auc,
-            "confusion_matrix": confusion_matrix(y_true, y_pred).tolist(),
+            "confusion_matrix": confusion_matrix(y_true, y_pred, labels=labels).tolist(),
             "classification_report": classification_report(
                 y_true, y_pred,
-                target_names=self.class_names,
+                labels=labels,
+                target_names=class_names,
                 zero_division=0,
                 output_dict=True,
             ),
         }
+
+    def _prepare_eval_arrays(
+        self,
+        y_true: np.ndarray,
+        y_pred: np.ndarray,
+        y_proba: Optional[np.ndarray],
+    ) -> tuple[np.ndarray, np.ndarray, Optional[np.ndarray], list[str]]:
+        """Normalize evaluation targets for multiclass and binary-anomaly models."""
+        if y_proba is not None and y_proba.ndim == 2 and y_proba.shape[1] == len(self.class_names):
+            return y_true, y_pred, y_proba, self.class_names
+
+        if len(self.class_names) > 2:
+            y_true_binary = (y_true != 0).astype(int)
+            y_pred_binary = (y_pred != 0).astype(int)
+
+            if y_proba is not None and y_proba.ndim == 2:
+                if y_proba.shape[1] >= 2:
+                    y_proba_binary = y_proba[:, :2]
+                else:
+                    attack_scores = y_proba[:, 0]
+                    y_proba_binary = np.column_stack([1.0 - attack_scores, attack_scores])
+            else:
+                y_proba_binary = None
+
+            return y_true_binary, y_pred_binary, y_proba_binary, ["benign", "attack"]
+
+        return y_true, y_pred, y_proba, self.class_names
 
     def _plot_confusion_matrix(
         self,
@@ -198,13 +234,15 @@ class Evaluator:
         y_pred: np.ndarray,
         model_name: str,
         split: str,
+        class_names: list[str],
     ) -> None:
-        cm = confusion_matrix(y_true, y_pred)
-        n = len(self.class_names)
+        labels = list(range(len(class_names)))
+        cm = confusion_matrix(y_true, y_pred, labels=labels)
+        n = len(class_names)
         fig, ax = plt.subplots(figsize=(max(8, n), max(6, n - 1)))
         disp = ConfusionMatrixDisplay(
             confusion_matrix=cm,
-            display_labels=self.class_names,
+            display_labels=class_names,
         )
         disp.plot(ax=ax, cmap="Blues", colorbar=True, xticks_rotation=45)
         ax.set_title(f"Confusion Matrix – {model_name} ({split})", fontsize=13)
@@ -220,15 +258,16 @@ class Evaluator:
         y_proba: np.ndarray,
         model_name: str,
         split: str,
+        class_names: list[str],
     ) -> None:
-        n_classes = len(self.class_names)
+        n_classes = len(class_names)
         fig, ax = plt.subplots(figsize=(9, 7))
 
         if n_classes == 2:
             RocCurveDisplay.from_predictions(y_true, y_proba[:, 1], ax=ax, name=model_name)
         else:
             y_bin = label_binarize(y_true, classes=list(range(n_classes)))
-            for i, cls_name in enumerate(self.class_names):
+            for i, cls_name in enumerate(class_names):
                 if y_bin[:, i].sum() == 0:
                     continue
                 RocCurveDisplay.from_predictions(
@@ -236,7 +275,7 @@ class Evaluator:
                     y_proba[:, i],
                     ax=ax,
                     name=cls_name,
-                    alpha=0.7,
+                    curve_kwargs={"alpha": 0.7},
                 )
 
         ax.plot([0, 1], [0, 1], "k--", label="Random")

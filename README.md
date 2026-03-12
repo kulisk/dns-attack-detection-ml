@@ -109,20 +109,22 @@ dns-attack-detection-ml/
 - (optional) CUDA 11.8+ for GPU-accelerated MLP/LSTM training
 - (optional) WinPcap / Npcap (Windows) or libpcap (Linux/macOS) for live capture
 
+> On Windows, prefer `py -3` instead of `python` if `python` points to Python 2.x.
+
 ```bash
 # 1. Clone the repository
 git clone https://github.com/your-org/dns-attack-detection-ml.git
 cd dns-attack-detection-ml
 
 # 2. Create a virtual environment
-python -m venv .venv
+py -3 -m venv .venv
 # Windows
 .venv\Scripts\activate
 # Linux/macOS
 source .venv/bin/activate
 
 # 3. Install dependencies
-pip install -r requirements.txt
+py -3 -m pip install -r requirements.txt
 ```
 
 ---
@@ -133,13 +135,16 @@ The fastest way to verify the system works end-to-end using the built-in **synth
 
 ```bash
 # Train Random Forest on synthetic data (no real dataset needed)
-python main.py train --model random_forest
+py -3 main.py train --model random_forest
 
 # Train all supervised models
-python main.py train --model all
+py -3 main.py train --model all
+
+# Train all unsupervised models
+py -3 main.py train --model all --unsupervised
 
 # Run tests
-python main.py test -v
+py -3 main.py test -v
 ```
 
 ---
@@ -148,20 +153,21 @@ python main.py test -v
 
 ### Supervised models
 ```bash
-python main.py train --model random_forest
-python main.py train --model xgboost
-python main.py train --model svm
-python main.py train --model mlp
-python main.py train --model lstm
-python main.py train --model all          # trains all five
+py -3 main.py train --model random_forest
+py -3 main.py train --model xgboost
+py -3 main.py train --model svm
+py -3 main.py train --model mlp
+py -3 main.py train --model lstm
+py -3 main.py train --model all          # trains all five supervised models
 ```
 
 ### Unsupervised (anomaly detection)
 ```bash
-python main.py train --model isolation_forest --unsupervised
-python main.py train --model one_class_svm    --unsupervised
-python main.py train --model dbscan           --unsupervised
-python main.py train --model autoencoder      --unsupervised
+py -3 main.py train --model isolation_forest --unsupervised
+py -3 main.py train --model one_class_svm    --unsupervised
+py -3 main.py train --model dbscan           --unsupervised
+py -3 main.py train --model autoencoder      --unsupervised
+py -3 main.py train --model all              --unsupervised   # trains all four anomaly detectors
 ```
 
 ### Options
@@ -195,10 +201,10 @@ Supported public datasets (set `source` accordingly):
 
 ```bash
 # Detect on interface eth0, using saved random_forest model
-python main.py detect --interface eth0 --model random_forest
+py -3 main.py detect --interface eth0 --model random_forest
 
 # Set a custom alert threshold and run for 60 s
-python main.py detect --interface eth0 --model xgboost --threshold 0.80 --duration 60
+py -3 main.py detect --interface eth0 --model xgboost --threshold 0.80 --duration 60
 ```
 
 Windows users: replace `eth0` with the adapter name shown by `ipconfig` (e.g., `Ethernet`).
@@ -210,7 +216,7 @@ Windows users: replace `eth0` with the adapter name shown by `ipconfig` (e.g., `
 The alert microservice exposes a lightweight FastAPI application.
 
 ```bash
-python main.py api --port 8000
+py -3 main.py api --port 8000
 ```
 
 | Method | Endpoint | Description |
@@ -231,16 +237,16 @@ After training, evaluation artefacts are saved to `reports/`:
 
 ```
 reports/
-├── random_forest_metrics.json          # All scalar metrics
-├── random_forest_confusion_matrix.png
-├── random_forest_roc_curves.png
-├── random_forest_feature_importance.png
+├── random_forest_test_metrics.json          # All scalar metrics
+├── random_forest_test_confusion_matrix.png
+├── random_forest_test_roc.png
+├── random_forest_test_feature_importance.png
 └── model_comparison.png                # only when >1 model trained
 ```
 
 Evaluate a saved model on an external CSV:
 ```bash
-python main.py evaluate --model random_forest --data datasets/test.csv
+py -3 main.py evaluate --model random_forest --data datasets/test.csv
 ```
 
 ---
@@ -252,7 +258,7 @@ All hyper-parameters live in `configs/config.yaml`. You can override any value u
 ```bash
 export DNS_SUPERVISED__RANDOM_FOREST__N_ESTIMATORS=500
 export DNS_LOGGING__LEVEL=DEBUG
-python main.py train --model random_forest
+py -3 main.py train --model random_forest
 ```
 
 Key sections:
@@ -275,10 +281,10 @@ Key sections:
 
 ```bash
 # Via CLI
-python main.py test -v
+py -3 main.py test -v
 
 # Directly with pytest
-pytest tests/ -v --tb=short
+py -3 -m pytest tests/ -v --tb=short
 ```
 
 ---
