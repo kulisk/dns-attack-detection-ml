@@ -130,10 +130,17 @@ def _train_unsupervised_models(trainer, model_name: str, use_smote: bool, model_
     from src.models.unsupervised import (
         AutoencoderDetector, DBSCANDetector, IsolationForestDetector, OneClassSVMDetector
     )
+    dbscan_cfg = trainer.cfg.get("unsupervised.dbscan", {}) or {}
     model_map = {
         "isolation_forest": lambda: IsolationForestDetector(model_dir=model_dir),
         "one_class_svm": lambda: OneClassSVMDetector(model_dir=model_dir),
-        "dbscan": lambda: DBSCANDetector(model_dir=model_dir),
+        "dbscan": lambda: DBSCANDetector(
+            eps=float(dbscan_cfg.get("eps", 0.5)),
+            min_samples=int(dbscan_cfg.get("min_samples", 5)),
+            algorithm=dbscan_cfg.get("algorithm", "auto"),
+            n_jobs=int(dbscan_cfg.get("n_jobs", -1)),
+            model_dir=model_dir,
+        ),
         "autoencoder": lambda: AutoencoderDetector(model_dir=model_dir),
     }
     keys = list(model_map.keys()) if model_name == "all" else [model_name]

@@ -127,8 +127,8 @@ unsupervised:
     gamma: "scale"
 
   dbscan:
-    eps: 0.5
-    min_samples: 5
+    eps: 3.6
+    min_samples: 10
     algorithm: "auto"
     n_jobs: -1
 
