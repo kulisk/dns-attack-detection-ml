@@ -25,6 +25,11 @@ test_run.log
 # Data byproducts
 data/processed/
 
+# Downloaded external datasets
+datasets/external/
+datasets/**/*.zip
+datasets/**/*.rar
+
 # OS files
 .DS_Store
 Thumbs.db

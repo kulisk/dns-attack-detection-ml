@@ -216,15 +216,25 @@ class DatasetLoader:
         col = next((c for c in label_candidates if c in df.columns), None)
         if col is None:
             raise ValueError("No label column found in UNSW-NB15 dataset")
-        df = df.rename(columns={col: "label"})
-        df["label"] = df["label"].fillna("benign")
+        label_series = df[col]
+        if isinstance(label_series, pd.DataFrame):
+            label_series = label_series.iloc[:, 0]
+        df["label"] = label_series.astype(str).fillna("benign")
         df["label"] = df["label"].str.lower().str.strip().str.replace(" ", "_")
         # Map generic attack labels to known attack types
         attack_map = {
+            "normal": "benign",
+            "benign": "benign",
             "generic": "dns_ddos",
+            "analysis": "cache_poisoning",
+            "backdoor": "botnet_dns",
+            "backdoors": "botnet_dns",
+            "reconnaissance": "nxdomain_attack",
+            "shellcode": "data_exfiltration",
+            "worms": "botnet_dns",
             "exploits": "dns_amplification",
             "fuzzers": "botnet_dns",
             "dos": "dns_ddos",
         }
-        df["label"] = df["label"].map(lambda x: attack_map.get(x, x))
+        df["label"] = df["label"].map(lambda x: attack_map.get(x, "dns_tunneling"))
         return df

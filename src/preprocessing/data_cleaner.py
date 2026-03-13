@@ -129,11 +129,11 @@ class DataCleaner:
             df = df.dropna(subset=num_cols)
         elif self.missing_strategy == "mean" and self._means is not None:
             for col in num_cols:
-                df[col].fillna(self._means.get(col, 0), inplace=True)
+                df[col] = df[col].fillna(self._means.get(col, 0))
         else:  # median (default)
             if self._medians is not None:
                 for col in num_cols:
-                    df[col].fillna(self._medians.get(col, 0), inplace=True)
+                    df[col] = df[col].fillna(self._medians.get(col, 0))
         return df
 
     def _clip_outliers(self, df: pd.DataFrame, num_cols: list[str]) -> pd.DataFrame:

@@ -131,9 +131,24 @@ def _train_unsupervised_models(trainer, model_name: str, use_smote: bool, model_
         AutoencoderDetector, DBSCANDetector, IsolationForestDetector, OneClassSVMDetector
     )
     dbscan_cfg = trainer.cfg.get("unsupervised.dbscan", {}) or {}
+    iforest_cfg = trainer.cfg.get("unsupervised.isolation_forest", {}) or {}
+    ocsvm_cfg = trainer.cfg.get("unsupervised.one_class_svm", {}) or {}
+    ae_cfg = trainer.cfg.get("unsupervised.autoencoder", {}) or {}
     model_map = {
-        "isolation_forest": lambda: IsolationForestDetector(model_dir=model_dir),
-        "one_class_svm": lambda: OneClassSVMDetector(model_dir=model_dir),
+        "isolation_forest": lambda: IsolationForestDetector(
+            n_estimators=int(iforest_cfg.get("n_estimators", 200)),
+            contamination=float(iforest_cfg.get("contamination", 0.05)),
+            max_samples=iforest_cfg.get("max_samples", "auto"),
+            random_state=int(iforest_cfg.get("random_state", 42)),
+            n_jobs=int(iforest_cfg.get("n_jobs", -1)),
+            model_dir=model_dir,
+        ),
+        "one_class_svm": lambda: OneClassSVMDetector(
+            kernel=ocsvm_cfg.get("kernel", "rbf"),
+            nu=float(ocsvm_cfg.get("nu", 0.1)),
+            gamma=ocsvm_cfg.get("gamma", "scale"),
+            model_dir=model_dir,
+        ),
         "dbscan": lambda: DBSCANDetector(
             eps=float(dbscan_cfg.get("eps", 0.5)),
             min_samples=int(dbscan_cfg.get("min_samples", 5)),
@@ -141,7 +156,15 @@ def _train_unsupervised_models(trainer, model_name: str, use_smote: bool, model_
             n_jobs=int(dbscan_cfg.get("n_jobs", -1)),
             model_dir=model_dir,
         ),
-        "autoencoder": lambda: AutoencoderDetector(model_dir=model_dir),
+        "autoencoder": lambda: AutoencoderDetector(
+            encoding_dims=ae_cfg.get("encoding_dims", [64, 32, 16]),
+            learning_rate=float(ae_cfg.get("learning_rate", 0.001)),
+            batch_size=int(ae_cfg.get("batch_size", 512)),
+            epochs=int(ae_cfg.get("epochs", 25)),
+            patience=int(ae_cfg.get("patience", 6)),
+            anomaly_threshold_percentile=int(ae_cfg.get("anomaly_threshold_percentile", 95)),
+            model_dir=model_dir,
+        ),
     }
     keys = list(model_map.keys()) if model_name == "all" else [model_name]
     for key in keys:

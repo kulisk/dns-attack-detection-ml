@@ -1,0 +1,166 @@
+# UNSW-NB15 focused configuration for full retraining
+project:
+  name: "DNS Attack Detection ML System"
+  version: "1.0.0"
+  description: "UNSW-NB15 retraining config"
+
+paths:
+  data_raw: "data/raw"
+  data_processed: "data/processed"
+  datasets: "datasets/external/unsw_nb15"
+  models: "models"
+  logs: "logs"
+  reports: "reports"
+  checkpoints: "checkpoints"
+
+dataset:
+  source: "unsw_nb15"
+  test_size: 0.20
+  val_size: 0.10
+  random_state: 42
+  stratify: true
+
+attack_types:
+  - "benign"
+  - "dns_ddos"
+  - "dns_amplification"
+  - "dns_tunneling"
+  - "cache_poisoning"
+  - "nxdomain_attack"
+  - "data_exfiltration"
+  - "botnet_dns"
+
+label_column: "label"
+binary_label_column: "is_attack"
+
+preprocessing:
+  handle_missing: "median"
+  outlier_method: "iqr"
+  outlier_threshold: 3.0
+  scaler: "standard"
+  encode_categoricals: true
+
+feature_engineering:
+  entropy_features: true
+  time_window_seconds: 60
+  aggregation_windows: [10, 30, 60, 300]
+  min_query_freq_threshold: 2
+  max_subdomain_depth: 10
+
+imbalance:
+  strategy: "none"
+  sampling_strategy: "auto"
+  k_neighbors: 5
+
+supervised:
+  random_forest:
+    n_estimators: 250
+    max_depth: 24
+    min_samples_split: 3
+    min_samples_leaf: 1
+    class_weight: "balanced"
+    n_jobs: -1
+    random_state: 42
+
+  xgboost:
+    n_estimators: 350
+    max_depth: 9
+    learning_rate: 0.05
+    subsample: 0.85
+    colsample_bytree: 0.85
+    scale_pos_weight: 1
+    n_jobs: -1
+    random_state: 42
+    eval_metric: "logloss"
+    use_label_encoder: false
+
+  svm:
+    kernel: "rbf"
+    C: 2.0
+    gamma: "scale"
+    probability: true
+    class_weight: "balanced"
+    max_iter: 4000
+
+  mlp:
+    hidden_layers: [256, 128, 64]
+    dropout_rate: 0.2
+    learning_rate: 0.001
+    batch_size: 512
+    epochs: 20
+    patience: 5
+    activation: "relu"
+
+  lstm:
+    hidden_size: 128
+    num_layers: 2
+    dropout_rate: 0.2
+    learning_rate: 0.001
+    batch_size: 128
+    epochs: 15
+    patience: 4
+    sequence_length: 20
+
+unsupervised:
+  isolation_forest:
+    n_estimators: 300
+    contamination: 0.30
+    max_samples: "auto"
+    random_state: 42
+    n_jobs: -1
+
+  one_class_svm:
+    kernel: "linear"
+    nu: 0.20
+    gamma: "auto"
+
+  dbscan:
+    eps: 3.6
+    min_samples: 3
+    algorithm: "auto"
+    n_jobs: -1
+
+  autoencoder:
+    encoding_dims: [128, 64, 32]
+    learning_rate: 0.001
+    batch_size: 512
+    epochs: 30
+    patience: 6
+    anomaly_threshold_percentile: 85
+
+evaluation:
+  metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+    - "f1_score"
+    - "roc_auc"
+    - "confusion_matrix"
+  average: "weighted"
+  save_plots: true
+  plot_format: "png"
+  dpi: 150
+
+realtime:
+  interface: "eth0"
+  filter: "udp port 53 or tcp port 53"
+  packet_buffer_size: 1000
+  inference_window: 10
+  alert_threshold: 0.75
+  model: "random_forest"
+  async_workers: 4
+  log_alerts: true
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  reload: false
+  workers: 2
+  alert_webhook_url: ""
+
+logging:
+  level: "INFO"
+  format: "json"
+  log_file: "logs/dns_detection.log"
+  max_bytes: 10485760
+  backup_count: 5
