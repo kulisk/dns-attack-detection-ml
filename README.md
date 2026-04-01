@@ -236,13 +236,87 @@ py -3 main.py train --model ensemble_neural
 ```yaml
 supervised:
   ensemble_neural:
-    consistency_lambda: 0.5
-    dropout_prob: 0.3
-    learning_rate: 0.001
-    batch_size: 128
-    epochs: 50
-    patience: 10
+    consistency_lambda: 0.5      # weight for consistency regularization loss
+    dropout_prob: 0.3            # dropout in all neural components
+    learning_rate: 0.001         # Adam optimizer learning rate
+    batch_size: 128              # mini-batch size
+    epochs: 50                   # maximum epochs
+    patience: 10                 # early stopping patience
 ```
+
+### Semi-Supervised Learning with Unlabeled Data
+
+The ensemble neural detector supports **consistency regularization** for semi-supervised learning:
+
+```python
+from src.models.supervised import SemiSupervisedEnsembleDetector
+
+# Create model with consistency regularization enabled
+model = SemiSupervisedEnsembleDetector(
+    input_dim=30,
+    n_classes=8,
+    consistency_lambda=0.5,  # Enable semi-supervised learning
+)
+
+# Option 1: Auto-generate synthetic benign unlabeled data
+model.fit(X_train, y_train)  # Automatically generates 5000+ unlabeled samples
+
+# Option 2: Use manually-generated unlabeled data
+X_unlabeled = model.generate_unlabeled_data(n_samples=10000)
+model.fit(X_train, y_train, X_unlabeled=X_unlabeled)
+
+# Option 3: Provide your own unlabeled benign traffic data
+model.fit(X_train, y_train, X_unlabeled=X_real_benign)
+```
+
+**How it works:**
+- KL divergence consistency loss encourages **stable predictions** between dropout-perturbed and clean inputs
+- Synthetic benign data is generated with realistic DNS traffic characteristics
+- Unlabeled data allows the model to learn better decision boundaries
+
+---
+
+## Hyperparameter Tuning
+
+Optimize ensemble neural detector hyperparameters using **Bayesian optimization** with Optuna:
+
+### Installation
+```bash
+py -3 -m pip install optuna scikit-optimize
+```
+
+### Tuning hyperparameters
+```python
+from src.training.hyperparameter_tuning_ensemble import EnsembleNeuralHyperparameterTuner
+
+# Create tuner with 50 trials and 5-fold cross-validation
+tuner = EnsembleNeuralHyperparameterTuner(
+    n_trials=50,
+    cv_folds=5,
+    scoring="f1_weighted",
+)
+
+# Run optimization
+results = tuner.tune(X_train, y_train)
+
+# Get best hyperparameters
+best_params = results["best_params"]
+print(f"Best F1 score: {results['best_value']:.4f}")
+print(f"Best hyperparameters: {best_params}")
+
+# Train final model with optimized hyperparameters
+model = SemiSupervisedEnsembleDetector(**best_params)
+model.fit(X_train, y_train, X_val=X_val, y_val=y_val)
+```
+
+### Tuned hyperparameters
+| Parameter | Range | Description |
+|-----------|-------|-------------|
+| `consistency_lambda` | [0.0, 1.0] | Weight of consistency regularization loss |
+| `dropout_prob` | [0.1, 0.5] | Dropout probability in neural components |
+| `learning_rate` | [1e-4, 1e-2] | Adam optimizer learning rate (log-uniform) |
+| `batch_size` | {32, 64, 128, 256} | Mini-batch size |
+| `patience` | [3, 15] | Early stopping patience (epochs) |
 
 ---
 
@@ -334,9 +408,36 @@ Key sections:
 # Via CLI
 py -3 main.py test -v
 
-# Directly with pytest
+# Run all tests with pytest
 py -3 -m pytest tests/ -v --tb=short
+
+# Run only ensemble neural detector tests
+py -3 -m pytest tests/test_all.py::TestEnsembleNeuralDetector -v
+
+# Run specific ensemble test
+py -3 -m pytest tests/test_all.py::TestEnsembleNeuralDetector::test_consistency_regularization -v
+
+# Run with coverage report
+py -3 -m pytest tests/ --cov=src --cov-report=html
 ```
+
+### Ensemble Neural Detector Tests
+
+Comprehensive test suite (`TestEnsembleNeuralDetector`) with 9 test methods:
+
+| Test | Purpose |
+|------|----------|
+| `test_model_instantiation` | Verify detector creation with runtime parameter binding |
+| `test_fit_predict_basic` | Basic training and inference on synthetic DNS data |
+| `test_consistency_regularization` | Consistency loss with explicit unlabeled data |
+| `test_auto_generated_unlabeled_data` | Verify auto-generation of synthetic benign samples |
+| `test_generate_unlabeled_data` | Manual generation of 1000 unlabeled samples |
+| `test_save_and_load` | Model persistence using torch.save/load |
+| `test_custom_hyperparameters` | Custom hyperparameter initialization |
+| `test_hyperparameter_tuning` | Optuna-based Bayesian optimization (skips if Optuna not installed) |
+| `test_ensemble_weights_learning` | Verify learnable ensemble weights are properly initialized |
+
+Run all: `py -3 -m pytest tests/test_all.py::TestEnsembleNeuralDetector -v`
 
 ---
 
