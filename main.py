@@ -62,7 +62,7 @@ def cli(ctx: click.Context, config: str) -> None:
     default="random_forest",
     show_default=True,
     type=click.Choice(
-        ["all", "random_forest", "xgboost", "svm", "mlp", "lstm",
+        ["all", "random_forest", "xgboost", "svm", "mlp", "lstm", "ensemble_neural",
          "isolation_forest", "one_class_svm", "dbscan", "autoencoder"],
         case_sensitive=False,
     ),
@@ -88,7 +88,7 @@ def train(
         "isolation_forest", "one_class_svm", "dbscan", "autoencoder"
     )
     supervised_models = (
-        "random_forest", "xgboost", "svm", "mlp", "lstm"
+        "random_forest", "xgboost", "svm", "mlp", "lstm", "ensemble_neural"
     )
 
     if unsupervised or model in unsupervised_models:
@@ -100,7 +100,8 @@ def train(
 
 def _train_supervised_models(trainer, model_name: str, use_smote: bool, model_dir: str) -> None:
     from src.models.supervised import (
-        LSTMDetector, MLPDetector, RandomForestDetector, SVMDetector, XGBoostDetector
+        LSTMDetector, MLPDetector, RandomForestDetector, SVMDetector, XGBoostDetector,
+        SemiSupervisedEnsembleDetector
     )
     model_map = {
         "random_forest": lambda: RandomForestDetector(model_dir=model_dir),
@@ -108,6 +109,7 @@ def _train_supervised_models(trainer, model_name: str, use_smote: bool, model_di
         "svm": lambda: SVMDetector(model_dir=model_dir),
         "mlp": lambda: MLPDetector(model_dir=model_dir),
         "lstm": lambda: LSTMDetector(model_dir=model_dir),
+        "ensemble_neural": lambda: SemiSupervisedEnsembleDetector(model_dir=model_dir),
     }
     keys = list(model_map.keys()) if model_name == "all" else [model_name]
     results = []

@@ -112,6 +112,14 @@ supervised:
     patience: 7
     sequence_length: 20
 
+  ensemble_neural:
+    consistency_lambda: 0.5
+    dropout_prob: 0.3
+    learning_rate: 0.001
+    batch_size: 128
+    epochs: 50
+    patience: 10
+
 # ---- Unsupervised Models ----
 unsupervised:
   isolation_forest:
