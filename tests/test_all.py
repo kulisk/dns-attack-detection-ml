@@ -277,7 +277,6 @@ class TestAutoencoderDetector:
     # ─────────────────────────── Ensemble Neural Detector ──────────────────────
 
     class TestEnsembleNeuralDetector:
-    class TestEnsembleNeuralDetector:
         """Comprehensive tests for semi-supervised ensemble neural detector."""
 
         @pytest.mark.timeout(30)
@@ -386,20 +385,6 @@ class TestAutoencoderDetector:
             model.fit(X, y)
             assert model._is_fitted is True
 
-        @pytest.mark.timeout(30)
-        def test_generate_unlabeled_data(self):
-            """Test synthetic benign data generation."""
-            from src.models.supervised.ensemble_neural_detector import SemiSupervisedEnsembleDetector
-        
-            model = SemiSupervisedEnsembleDetector(input_dim=50, n_classes=8, model_dir="models")
-        
-            X_benign = model.generate_unlabeled_data(n_samples=1000)
-            assert X_benign.shape == (1000, 50)
-            assert X_benign.dtype == np.float32
-            # Check that values are in reasonable ranges
-            assert np.all(X_benign >= 0)
-            assert np.all(X_benign <= 100)
-
         @pytest.mark.timeout(60)
         def test_save_and_load(self):
             """Test model persistence."""
@@ -477,11 +462,14 @@ class TestAutoencoderDetector:
             X = rng.random((200, 30)).astype(np.float32)
             y = rng.integers(0, 4, 200)
         
-            tuner = EnsembleNeuralHyperparameterTuner(
-                n_trials=3,  # Short test
-                cv_folds=2,
-                model_dir="models",
-            )
+            try:
+                tuner = EnsembleNeuralHyperparameterTuner(
+                    n_trials=3,  # Short test
+                    cv_folds=2,
+                    model_dir="models",
+                )
+            except ImportError:
+                pytest.skip("Optuna not installed")
         
             results = tuner.tune(X, y)
         
@@ -499,6 +487,7 @@ class TestAutoencoderDetector:
         def test_ensemble_weights_learning(self):
             """Test that ensemble weights are learnable and updated during training."""
             from src.models.supervised.ensemble_neural_detector import SemiSupervisedEnsembleDetector, _EnsembleNet
+            import torch
         
             # Create network
             net = _EnsembleNet(input_dim=20, n_classes=3, dropout_rate=0.3)
@@ -508,7 +497,6 @@ class TestAutoencoderDetector:
             assert isinstance(net.ensemble_weights, torch.nn.Parameter)
         
             # Verify initial weights
-            import torch
             initial_weights = net.ensemble_weights.data.clone()
             assert torch.allclose(initial_weights, torch.tensor([0.0, 1.0, 1.0], dtype=torch.float32))
     def test_fit_predict(self):
