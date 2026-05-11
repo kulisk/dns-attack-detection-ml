@@ -33,3 +33,4 @@ datasets/**/*.rar
 # OS files
 .DS_Store
 Thumbs.db
+dns-attack-detection-ml.code-workspace

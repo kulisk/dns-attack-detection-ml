@@ -8,10 +8,11 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
+from pandas.api.types import CategoricalDtype
 from imblearn.over_sampling import SMOTE
 
 from src.data_collection import DatasetLoader
@@ -53,9 +54,21 @@ class ModelTrainer:
             exclude_cols=list(NON_FEATURE_COLS),
         )
         self.extractor = DNSFeatureExtractor()
-        self.label_encoder = LabelEncoder(
-            known_classes=self.cfg.get("attack_types")
-        )
+        dataset_source = str(self.cfg.get("dataset.source", "synthetic")).lower()
+        known_classes = self.cfg.get("attack_types") if dataset_source == "synthetic" else None
+        self.label_encoder = LabelEncoder(known_classes=known_classes)
+        self._categorical_maps: dict[str, dict[str, int]] = {}
+
+        maps_path = self.model_dir / "categorical_maps.joblib"
+        if maps_path.exists():
+            try:
+                import joblib  # pyright: ignore[reportMissingTypeStubs]
+                self._categorical_maps = cast(
+                    dict[str, dict[str, int]],
+                    joblib.load(maps_path),  # pyright: ignore[reportUnknownMemberType]
+                )
+            except Exception:
+                self._categorical_maps = {}
 
     # ------------------------------------------------------------------ #
     # Public API                                                           #
@@ -107,6 +120,12 @@ class ModelTrainer:
         y_test = self.label_encoder.transform(test_df[label_col])
 
         feature_cols = [c for c in train_df.columns if c not in NON_FEATURE_COLS]
+        train_df, val_df, test_df = self._encode_categorical_features(
+            train_df,
+            val_df,
+            test_df,
+            feature_cols,
+        )
 
         # ── 5. Scale (fit on train only) ──────────────────────────────
         logger.info("Scaling features …")
@@ -178,6 +197,19 @@ class ModelTrainer:
         df = self.cleaner.transform(df, label_col)
         y = self.label_encoder.transform(df[label_col])
         feature_cols = [c for c in df.columns if c not in NON_FEATURE_COLS]
+        for col in feature_cols:
+            if col not in df.columns:
+                continue
+            if col in self._categorical_maps:
+                mapping = self._categorical_maps[col]
+                df[col] = (
+                    df[col]
+                    .astype(str)
+                    .fillna("__nan__")
+                    .map(mapping)
+                    .fillna(-1)
+                    .astype(float)
+                )
         df_s = self.scaler.transform(df[feature_cols])
         return df_s.values, y
 
@@ -208,8 +240,39 @@ class ModelTrainer:
 
     def _save_preprocessors(self) -> None:
         """Persist the fitted cleaner and scaler for inference use."""
-        import joblib
-        joblib.dump(self.cleaner, self.model_dir / "cleaner.joblib")
-        joblib.dump(self.scaler, self.model_dir / "scaler.joblib")
-        joblib.dump(self.label_encoder, self.model_dir / "label_encoder.joblib")
+        import joblib  # pyright: ignore[reportMissingTypeStubs]
+        joblib.dump(self.cleaner, self.model_dir / "cleaner.joblib")  # pyright: ignore[reportUnknownMemberType]
+        joblib.dump(self.scaler, self.model_dir / "scaler.joblib")  # pyright: ignore[reportUnknownMemberType]
+        joblib.dump(self.label_encoder, self.model_dir / "label_encoder.joblib")  # pyright: ignore[reportUnknownMemberType]
+        joblib.dump(self._categorical_maps, self.model_dir / "categorical_maps.joblib")  # pyright: ignore[reportUnknownMemberType]
         logger.info("Preprocessors saved", extra={"dir": str(self.model_dir)})
+
+    def _encode_categorical_features(
+        self,
+        train_df: pd.DataFrame,
+        val_df: pd.DataFrame,
+        test_df: pd.DataFrame,
+        feature_cols: list[str],
+    ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        """Encode string-like feature columns to numeric values."""
+        self._categorical_maps = {}
+        for col in feature_cols:
+            if col not in train_df.columns:
+                continue
+            dtype = train_df[col].dtype
+            if (
+                pd.api.types.is_object_dtype(dtype)
+                or pd.api.types.is_string_dtype(dtype)
+                or isinstance(dtype, CategoricalDtype)
+                or pd.api.types.is_bool_dtype(dtype)
+            ):
+                train_values = train_df[col].astype(str).fillna("__nan__")
+                unique_values = list(pd.unique(train_values))
+                mapping = {value: idx for idx, value in enumerate(unique_values)}
+                self._categorical_maps[col] = mapping
+                train_df[col] = train_values.map(mapping).astype(float)
+                val_df[col] = val_df[col].astype(str).fillna("__nan__").map(mapping).fillna(-1).astype(float)
+                test_df[col] = test_df[col].astype(str).fillna("__nan__").map(mapping).fillna(-1).astype(float)
+        if self._categorical_maps:
+            logger.info("Categorical features encoded", extra={"n_categorical": len(self._categorical_maps)})
+        return train_df, val_df, test_df
