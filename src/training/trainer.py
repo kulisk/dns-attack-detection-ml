@@ -24,7 +24,7 @@ from src.utils.config_loader import ConfigLoader
 
 logger = get_logger(__name__)
 
-NON_FEATURE_COLS = {"label", "is_attack"}
+NON_FEATURE_COLS = {"label", "is_attack", "attack_cat"}
 
 
 class ModelTrainer:
