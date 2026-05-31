@@ -18,7 +18,7 @@ sys.path.insert(0, ".")
 SUPERVISED = {"random_forest", "xgboost", "svm", "mlp", "lstm", "ensemble_neural"}
 CLEAN_DATE = datetime.date(2026, 6, 1)
 
-sep = "=" * 78
+sep = "=" * 90
 
 # ── 1. Collect all metrics ──────────────────────────────────────────────────
 
@@ -35,6 +35,8 @@ for f in files:
         "f1_weighted": d.get("f1_weighted", 0),
         "f1_macro": d.get("f1_macro", 0),
         "roc_auc": d.get("roc_auc", 0),
+        "latency_ms": d.get("inference_latency_ms_single", None),
+        "throughput": d.get("throughput_samples_per_sec", None),
         "clean": retrained,
         "supervised": d.get("model", "") in SUPERVISED,
     })
@@ -45,13 +47,26 @@ rows.sort(key=lambda x: x["f1_weighted"], reverse=True)  # type: ignore[return-v
 
 sup_rows = [r for r in rows if r["supervised"]]  # type: ignore[index]
 
+has_latency = any(r["latency_ms"] is not None for r in sup_rows)
+
 print("\n" + sep)
 print("  SUPERVISED MODELS -- ranked by F1 Weighted (all retrained without attack_cat)")
 print(sep)
-print(f"  {'#':<3} {'Model':<22} {'Accuracy':>9} {'F1-W':>8} {'F1-M':>8} {'ROC-AUC':>9}")
-print("-" * 78)
-for i, r in enumerate(sup_rows, 1):
-    print(f"  {i:<3} {r['model']:<22} {r['accuracy']:>9.4f} {r['f1_weighted']:>8.4f} {r['f1_macro']:>8.4f} {r['roc_auc']:>9.4f}")  # type: ignore[index]
+
+if has_latency:
+    print(f"  {'#':<3} {'Model':<22} {'Accuracy':>9} {'F1-W':>8} {'F1-M':>8} {'ROC-AUC':>9} {'Lat(ms)':>9} {'Throughput':>12}")
+    print("-" * 90)
+    for i, r in enumerate(sup_rows, 1):
+        lat = f"{r['latency_ms']:>9.4f}" if r["latency_ms"] is not None else f"{'N/A':>9}"
+        thr = f"{r['throughput']:>12,.1f}" if r["throughput"] is not None else f"{'N/A':>12}"
+        print(f"  {i:<3} {r['model']:<22} {r['accuracy']:>9.4f} {r['f1_weighted']:>8.4f} {r['f1_macro']:>8.4f} {r['roc_auc']:>9.4f} {lat} {thr}")  # type: ignore[index]
+else:
+    print(f"  {'#':<3} {'Model':<22} {'Accuracy':>9} {'F1-W':>8} {'F1-M':>8} {'ROC-AUC':>9}")
+    print("-" * 78)
+    for i, r in enumerate(sup_rows, 1):
+        print(f"  {i:<3} {r['model']:<22} {r['accuracy']:>9.4f} {r['f1_weighted']:>8.4f} {r['f1_macro']:>8.4f} {r['roc_auc']:>9.4f}")  # type: ignore[index]
+    print("\n  [!] Run benchmark_latency.py to add inference latency columns.")
+
 print(sep)
 
 # ── 3. Feature importances -- Random Forest (clean, synthetic data) ─────────

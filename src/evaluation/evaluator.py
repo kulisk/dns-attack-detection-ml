@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from pathlib import Path
 from typing import Optional
 
@@ -82,7 +83,22 @@ class Evaluator:
             Metrics dictionary.
         """
         logger.info(f"Evaluating {model.name} on {split} set …")
+
+        # Batch inference timing
+        t0 = time.perf_counter()
         y_pred = model.predict(X)
+        batch_elapsed = time.perf_counter() - t0
+
+        # Single-sample latency (50 warmup + 100 timed runs)
+        x_single = X[:1]
+        for _ in range(50):
+            model.predict(x_single)
+        t_single_start = time.perf_counter()
+        _SINGLE_RUNS = 100
+        for _ in range(_SINGLE_RUNS):
+            model.predict(x_single)
+        single_elapsed = (time.perf_counter() - t_single_start) / _SINGLE_RUNS
+
         try:
             y_proba = model.predict_proba(X)
         except Exception:
@@ -97,6 +113,9 @@ class Evaluator:
         metrics = self._compute_metrics(y_true_eval, y_pred_eval, y_proba_eval, eval_class_names)
         metrics["model"] = model.name
         metrics["split"] = split
+        metrics["inference_latency_ms_single"] = round(single_elapsed * 1000, 4)
+        metrics["inference_latency_ms_batch"] = round(batch_elapsed * 1000, 2)
+        metrics["throughput_samples_per_sec"] = round(len(X) / batch_elapsed, 1)
 
         # Save metrics to JSON
         metrics_path = self.output_dir / f"{model.name}_{split}_metrics.json"
