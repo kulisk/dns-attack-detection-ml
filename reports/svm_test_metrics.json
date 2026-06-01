@@ -4,7 +4,7 @@
   "recall_weighted": 0.9973333333333333,
   "f1_weighted": 0.9973329806108253,
   "f1_macro": 0.9973320350072079,
-  "roc_auc": 0.9999856418211835,
+  "roc_auc": 0.9999856046339539,
   "confusion_matrix": [
     [
       9310,
@@ -152,7 +152,7 @@
   },
   "model": "svm",
   "split": "test",
-  "inference_latency_ms_single": 0.0902,
-  "inference_latency_ms_batch": 3608.39,
-  "throughput_samples_per_sec": 20784.9
+  "inference_latency_ms_single": 0.0871,
+  "inference_latency_ms_batch": 3351.41,
+  "throughput_samples_per_sec": 22378.6
 }

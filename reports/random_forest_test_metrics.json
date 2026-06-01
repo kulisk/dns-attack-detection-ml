@@ -152,9 +152,9 @@
   },
   "model": "random_forest",
   "split": "test",
-  "inference_latency_ms_single": 69.7393,
-  "inference_latency_ms_batch": 280.18,
-  "throughput_samples_per_sec": 267680.9,
+  "inference_latency_ms_single": 68.257,
+  "inference_latency_ms_batch": 279.84,
+  "throughput_samples_per_sec": 268014.1,
   "feature_importances": {
     "ttl_mean": 0.067077,
     "unique_src_ips": 0.061057,

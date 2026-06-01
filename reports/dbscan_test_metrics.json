@@ -44,7 +44,7 @@
   },
   "model": "dbscan",
   "split": "test",
-  "inference_latency_ms_single": 0.5764,
-  "inference_latency_ms_batch": 598.27,
-  "throughput_samples_per_sec": 125362.3
+  "inference_latency_ms_single": 0.56,
+  "inference_latency_ms_batch": 602.61,
+  "throughput_samples_per_sec": 124458.3
 }

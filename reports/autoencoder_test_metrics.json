@@ -1,50 +1,50 @@
 {
-  "accuracy": 0.8059333333333333,
-  "precision_weighted": 0.9160589425380722,
-  "recall_weighted": 0.8059333333333333,
-  "f1_weighted": 0.8357200986465272,
-  "f1_macro": 0.7126075828223304,
-  "roc_auc": 0.9552221865583211,
+  "accuracy": 0.8072133333333333,
+  "precision_weighted": 0.916167889187322,
+  "recall_weighted": 0.8072133333333333,
+  "f1_weighted": 0.836715333686036,
+  "f1_macro": 0.713806682249889,
+  "roc_auc": 0.9558569553082628,
   "confusion_matrix": [
     [
-      8853,
-      457
+      8847,
+      463
     ],
     [
-      14098,
-      51592
+      13996,
+      51694
     ]
   ],
   "classification_report": {
     "benign": {
-      "precision": 0.3857348263692214,
-      "recall": 0.9509129967776584,
-      "f1-score": 0.5488360559189114,
+      "precision": 0.38729588933152387,
+      "recall": 0.9502685284640172,
+      "f1-score": 0.5503063477747022,
       "support": 9310.0
     },
     "attack": {
-      "precision": 0.9912198121001364,
-      "recall": 0.785385903486071,
-      "f1-score": 0.8763791097257493,
+      "precision": 0.99112295569147,
+      "recall": 0.7869386512406759,
+      "f1-score": 0.8773070167250757,
       "support": 65690.0
     },
-    "accuracy": 0.8059333333333333,
+    "accuracy": 0.8072133333333333,
     "macro avg": {
-      "precision": 0.6884773192346789,
-      "recall": 0.8681494501318647,
-      "f1-score": 0.7126075828223304,
+      "precision": 0.689209422511497,
+      "recall": 0.8686035898523465,
+      "f1-score": 0.713806682249889,
       "support": 75000.0
     },
     "weighted avg": {
-      "precision": 0.9160589425380722,
-      "recall": 0.8059333333333333,
-      "f1-score": 0.8357200986465272,
+      "precision": 0.916167889187322,
+      "recall": 0.8072133333333333,
+      "f1-score": 0.836715333686036,
       "support": 75000.0
     }
   },
   "model": "autoencoder",
   "split": "test",
-  "inference_latency_ms_single": 0.3336,
-  "inference_latency_ms_batch": 28.71,
-  "throughput_samples_per_sec": 2612139.7
+  "inference_latency_ms_single": 0.1478,
+  "inference_latency_ms_batch": 24.62,
+  "throughput_samples_per_sec": 3046804.6
 }

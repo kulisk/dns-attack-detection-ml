@@ -5,14 +5,26 @@ from __future__ import annotations
 
 from typing import Optional
 
+import subprocess
+
 import numpy as np
-import torch
 from xgboost import XGBClassifier
 
 from src.models.base_detector import BaseDetector
 from src.utils import get_logger
 
 logger = get_logger(__name__)
+
+
+def _xgb_detect_device() -> str:
+    """Use nvidia-smi to check GPU availability (independent of PyTorch CUDA)."""
+    try:
+        r = subprocess.run(["nvidia-smi", "-L"], capture_output=True, text=True, timeout=5)
+        if r.returncode == 0 and "GPU" in r.stdout:
+            return "cuda"
+    except Exception:
+        pass
+    return "cpu"
 
 
 class XGBoostDetector(BaseDetector):
@@ -45,7 +57,9 @@ class XGBoostDetector(BaseDetector):
         model_dir: str = "models",
     ) -> None:
         super().__init__(name="xgboost", model_dir=model_dir)
-        _device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+        _device = device or _xgb_detect_device()
+        _n_jobs = 1 if _device == "cuda" else n_jobs
+        logger.info(f"XGBoost device: {_device}")
         self._params = dict(
             n_estimators=n_estimators,
             max_depth=max_depth,
@@ -53,10 +67,10 @@ class XGBoostDetector(BaseDetector):
             subsample=subsample,
             colsample_bytree=colsample_bytree,
             scale_pos_weight=scale_pos_weight,
-            n_jobs=n_jobs,
+            n_jobs=_n_jobs,
+            device=_device,
             random_state=random_state,
             eval_metric="mlogloss",
-            device=_device,
             verbosity=0,
         )
         self._model = XGBClassifier(**self._params)

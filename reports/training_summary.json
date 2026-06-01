@@ -6,7 +6,7 @@
     "precision_weighted": 0.9997,
     "recall_weighted": 0.9997,
     "roc_auc": 1.0,
-    "training_time_s": 42.25
+    "training_time_s": 41.03
   },
   {
     "model": "xgboost",
@@ -15,7 +15,7 @@
     "precision_weighted": 0.9997,
     "recall_weighted": 0.9997,
     "roc_auc": 1.0,
-    "training_time_s": 28.24
+    "training_time_s": 29.18
   },
   {
     "model": "svm",
@@ -24,33 +24,69 @@
     "precision_weighted": 0.9974,
     "recall_weighted": 0.9973,
     "roc_auc": 1.0,
-    "training_time_s": 37.98
+    "training_time_s": 36.88
   },
   {
     "model": "mlp",
-    "accuracy": 0.9992,
-    "f1_weighted": 0.9992,
-    "precision_weighted": 0.9992,
-    "recall_weighted": 0.9992,
+    "accuracy": 0.9994,
+    "f1_weighted": 0.9994,
+    "precision_weighted": 0.9994,
+    "recall_weighted": 0.9994,
     "roc_auc": 1.0,
-    "training_time_s": 156.92
+    "training_time_s": 301.53
   },
   {
     "model": "lstm",
-    "accuracy": 0.9993,
-    "f1_weighted": 0.9993,
-    "precision_weighted": 0.9993,
-    "recall_weighted": 0.9993,
+    "accuracy": 0.9994,
+    "f1_weighted": 0.9994,
+    "precision_weighted": 0.9994,
+    "recall_weighted": 0.9994,
     "roc_auc": 1.0,
-    "training_time_s": 296.84
+    "training_time_s": 498.61
   },
   {
     "model": "ensemble_neural",
-    "accuracy": 0.9985,
-    "f1_weighted": 0.9985,
-    "precision_weighted": 0.9985,
-    "recall_weighted": 0.9985,
+    "accuracy": 0.9984,
+    "f1_weighted": 0.9984,
+    "precision_weighted": 0.9984,
+    "recall_weighted": 0.9984,
     "roc_auc": 1.0,
-    "training_time_s": 140.79
+    "training_time_s": 252.26
+  },
+  {
+    "model": "isolation_forest",
+    "accuracy": 0.9366,
+    "f1_weighted": 0.941,
+    "precision_weighted": 0.9528,
+    "recall_weighted": 0.9366,
+    "roc_auc": 0.988,
+    "training_time_s": 28.15
+  },
+  {
+    "model": "autoencoder",
+    "accuracy": 0.8072,
+    "f1_weighted": 0.8367,
+    "precision_weighted": 0.9162,
+    "recall_weighted": 0.8072,
+    "roc_auc": 0.9559,
+    "training_time_s": 38.23
+  },
+  {
+    "model": "one_class_svm",
+    "accuracy": 0.9928,
+    "f1_weighted": 0.9927,
+    "precision_weighted": 0.9928,
+    "recall_weighted": 0.9928,
+    "roc_auc": 0.9999,
+    "training_time_s": 45.52
+  },
+  {
+    "model": "dbscan",
+    "accuracy": 0.9991,
+    "f1_weighted": 0.9991,
+    "precision_weighted": 0.9991,
+    "recall_weighted": 0.9991,
+    "roc_auc": 1.0,
+    "training_time_s": 118.48
   }
 ]

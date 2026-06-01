@@ -44,7 +44,7 @@
   },
   "model": "one_class_svm",
   "split": "test",
-  "inference_latency_ms_single": 0.1466,
-  "inference_latency_ms_batch": 7367.49,
-  "throughput_samples_per_sec": 10179.9
+  "inference_latency_ms_single": 0.1382,
+  "inference_latency_ms_batch": 7191.81,
+  "throughput_samples_per_sec": 10428.5
 }

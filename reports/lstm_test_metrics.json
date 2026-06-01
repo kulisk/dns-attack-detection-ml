@@ -1,10 +1,10 @@
 {
-  "accuracy": 0.9992933333333334,
-  "precision_weighted": 0.9992954772443268,
-  "recall_weighted": 0.9992933333333334,
-  "f1_weighted": 0.9992933263517415,
-  "f1_macro": 0.9992930911901634,
-  "roc_auc": 0.9999974120798342,
+  "accuracy": 0.9994266666666667,
+  "precision_weighted": 0.9994275477058726,
+  "recall_weighted": 0.9994266666666667,
+  "f1_weighted": 0.999426663606882,
+  "f1_macro": 0.9994264739589795,
+  "roc_auc": 0.9999977493343072,
   "confusion_matrix": [
     [
       9310,
@@ -40,10 +40,10 @@
       0,
       0,
       0,
-      9390,
+      9388,
       0,
       0,
-      7,
+      9,
       0
     ],
     [
@@ -70,10 +70,10 @@
       0,
       0,
       0,
-      46,
+      34,
       0,
       0,
-      9301,
+      9313,
       0
     ],
     [
@@ -107,9 +107,9 @@
       "support": 9355.0
     },
     "dns_tunneling": {
-      "precision": 0.9951250529885545,
-      "recall": 0.9992550814089604,
-      "f1-score": 0.997185790898954,
+      "precision": 0.9963914243260454,
+      "recall": 0.9990422475258061,
+      "f1-score": 0.9977150751899676,
       "support": 9397.0
     },
     "cache_poisoning": {
@@ -125,9 +125,9 @@
       "support": 9430.0
     },
     "data_exfiltration": {
-      "precision": 0.9992479587451655,
-      "recall": 0.9950786348561036,
-      "f1-score": 0.9971589386223533,
+      "precision": 0.9990345419437889,
+      "recall": 0.9963624692414679,
+      "f1-score": 0.9976967164818683,
       "support": 9347.0
     },
     "botnet_dns": {
@@ -136,23 +136,23 @@
       "f1-score": 1.0,
       "support": 9379.0
     },
-    "accuracy": 0.9992933333333334,
+    "accuracy": 0.9994266666666667,
     "macro avg": {
-      "precision": 0.999296626466715,
-      "recall": 0.999291714533133,
-      "f1-score": 0.9992930911901634,
+      "precision": 0.9994282457837294,
+      "recall": 0.9994255895959092,
+      "f1-score": 0.9994264739589795,
       "support": 75000.0
     },
     "weighted avg": {
-      "precision": 0.9992954772443268,
-      "recall": 0.9992933333333334,
-      "f1-score": 0.9992933263517415,
+      "precision": 0.9994275477058726,
+      "recall": 0.9994266666666667,
+      "f1-score": 0.999426663606882,
       "support": 75000.0
     }
   },
   "model": "lstm",
   "split": "test",
-  "inference_latency_ms_single": 0.1833,
-  "inference_latency_ms_batch": 57.42,
-  "throughput_samples_per_sec": 1306199.4
+  "inference_latency_ms_single": 0.2205,
+  "inference_latency_ms_batch": 96.88,
+  "throughput_samples_per_sec": 774155.4
 }

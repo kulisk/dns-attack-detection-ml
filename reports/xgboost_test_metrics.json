@@ -152,9 +152,9 @@
   },
   "model": "xgboost",
   "split": "test",
-  "inference_latency_ms_single": 2.2455,
-  "inference_latency_ms_batch": 23.53,
-  "throughput_samples_per_sec": 3187295.4,
+  "inference_latency_ms_single": 2.146,
+  "inference_latency_ms_batch": 47.49,
+  "throughput_samples_per_sec": 1579261.3,
   "feature_importances": {
     "avg_label_length": 0.148371,
     "answer_count": 0.135016,
