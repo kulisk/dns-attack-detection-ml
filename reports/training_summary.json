@@ -1,0 +1,92 @@
+[
+  {
+    "model": "random_forest",
+    "accuracy": 0.9997,
+    "f1_weighted": 0.9997,
+    "precision_weighted": 0.9997,
+    "recall_weighted": 0.9997,
+    "roc_auc": 1.0,
+    "training_time_s": 41.47
+  },
+  {
+    "model": "xgboost",
+    "accuracy": 0.9997,
+    "f1_weighted": 0.9997,
+    "precision_weighted": 0.9997,
+    "recall_weighted": 0.9997,
+    "roc_auc": 1.0,
+    "training_time_s": 27.82
+  },
+  {
+    "model": "svm",
+    "accuracy": 0.9973,
+    "f1_weighted": 0.9973,
+    "precision_weighted": 0.9974,
+    "recall_weighted": 0.9973,
+    "roc_auc": 1.0,
+    "training_time_s": 37.06
+  },
+  {
+    "model": "mlp",
+    "accuracy": 0.9992,
+    "f1_weighted": 0.9992,
+    "precision_weighted": 0.9992,
+    "recall_weighted": 0.9992,
+    "roc_auc": 1.0,
+    "training_time_s": 157.22
+  },
+  {
+    "model": "lstm",
+    "accuracy": 0.9993,
+    "f1_weighted": 0.9993,
+    "precision_weighted": 0.9993,
+    "recall_weighted": 0.9993,
+    "roc_auc": 1.0,
+    "training_time_s": 300.3
+  },
+  {
+    "model": "ensemble_neural",
+    "accuracy": 0.9982,
+    "f1_weighted": 0.9982,
+    "precision_weighted": 0.9982,
+    "recall_weighted": 0.9982,
+    "roc_auc": 1.0,
+    "training_time_s": 133.11
+  },
+  {
+    "model": "isolation_forest",
+    "accuracy": 0.9366,
+    "f1_weighted": 0.941,
+    "precision_weighted": 0.9528,
+    "recall_weighted": 0.9366,
+    "roc_auc": 0.988,
+    "training_time_s": 27.82
+  },
+  {
+    "model": "autoencoder",
+    "accuracy": 0.8059,
+    "f1_weighted": 0.8357,
+    "precision_weighted": 0.9161,
+    "recall_weighted": 0.8059,
+    "roc_auc": 0.9552,
+    "training_time_s": 49.1
+  },
+  {
+    "model": "one_class_svm",
+    "accuracy": 0.9928,
+    "f1_weighted": 0.9927,
+    "precision_weighted": 0.9928,
+    "recall_weighted": 0.9928,
+    "roc_auc": 0.9999,
+    "training_time_s": 46.14
+  },
+  {
+    "model": "dbscan",
+    "accuracy": 0.9991,
+    "f1_weighted": 0.9991,
+    "precision_weighted": 0.9991,
+    "recall_weighted": 0.9991,
+    "roc_auc": 1.0,
+    "training_time_s": 119.73
+  }
+]

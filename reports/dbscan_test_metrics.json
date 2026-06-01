@@ -1,0 +1,50 @@
+{
+  "accuracy": 0.9990666666666667,
+  "precision_weighted": 0.9990664377899396,
+  "recall_weighted": 0.9990666666666667,
+  "f1_weighted": 0.9990665375535056,
+  "f1_macro": 0.9978533042181087,
+  "roc_auc": 0.9999823308352433,
+  "confusion_matrix": [
+    [
+      9272,
+      38
+    ],
+    [
+      32,
+      65658
+    ]
+  ],
+  "classification_report": {
+    "benign": {
+      "precision": 0.9965606190885641,
+      "recall": 0.9959183673469387,
+      "f1-score": 0.9962393897066724,
+      "support": 9310.0
+    },
+    "attack": {
+      "precision": 0.9994215781782757,
+      "recall": 0.9995128634495357,
+      "f1-score": 0.999467218729545,
+      "support": 65690.0
+    },
+    "accuracy": 0.9990666666666667,
+    "macro avg": {
+      "precision": 0.99799109863342,
+      "recall": 0.9977156153982372,
+      "f1-score": 0.9978533042181087,
+      "support": 75000.0
+    },
+    "weighted avg": {
+      "precision": 0.9990664377899396,
+      "recall": 0.9990666666666667,
+      "f1-score": 0.9990665375535056,
+      "support": 75000.0
+    }
+  },
+  "model": "dbscan",
+  "split": "test",
+  "inference_latency_ms_single": 0.5764,
+  "inference_latency_ms_batch": 598.27,
+  "throughput_samples_per_sec": 125362.3
+}

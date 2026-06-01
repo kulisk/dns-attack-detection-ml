@@ -1,0 +1,158 @@
+{
+  "accuracy": 0.9982,
+  "precision_weighted": 0.9982142545140941,
+  "recall_weighted": 0.9982,
+  "f1_weighted": 0.9981999218598105,
+  "f1_macro": 0.9981993069547738,
+  "roc_auc": 0.9999908675146498,
+  "confusion_matrix": [
+    [
+      9310,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      9363,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      9355,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      9380,
+      0,
+      0,
+      17,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      9419,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      9430,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      118,
+      0,
+      0,
+      9229,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      9379
+    ]
+  ],
+  "classification_report": {
+    "benign": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 9310.0
+    },
+    "dns_ddos": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 9363.0
+    },
+    "dns_amplification": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 9355.0
+    },
+    "dns_tunneling": {
+      "precision": 0.9875763318593388,
+      "recall": 0.9981909119931893,
+      "f1-score": 0.9928552527123577,
+      "support": 9397.0
+    },
+    "cache_poisoning": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 9419.0
+    },
+    "nxdomain_attack": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 9430.0
+    },
+    "data_exfiltration": {
+      "precision": 0.9981613670776552,
+      "recall": 0.9873756285439178,
+      "f1-score": 0.9927392029258323,
+      "support": 9347.0
+    },
+    "botnet_dns": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 9379.0
+    },
+    "accuracy": 0.9982,
+    "macro avg": {
+      "precision": 0.9982172123671242,
+      "recall": 0.9981958175671384,
+      "f1-score": 0.9981993069547738,
+      "support": 75000.0
+    },
+    "weighted avg": {
+      "precision": 0.9982142545140941,
+      "recall": 0.9982,
+      "f1-score": 0.9981999218598105,
+      "support": 75000.0
+    }
+  },
+  "model": "ensemble_neural",
+  "split": "test",
+  "inference_latency_ms_single": 0.2107,
+  "inference_latency_ms_batch": 6.61,
+  "throughput_samples_per_sec": 11344318.4
+}
