@@ -117,6 +117,15 @@ class Evaluator:
         metrics["inference_latency_ms_batch"] = round(batch_elapsed * 1000, 2)
         metrics["throughput_samples_per_sec"] = round(len(X) / batch_elapsed, 1)
 
+        # Feature importances dict (if supported by the model)
+        if hasattr(model, "feature_importances") and model.feature_names:
+            names = model.feature_names
+            imps = model.feature_importances  # type: ignore[attr-defined]
+            top_n = 25
+            paired = sorted(zip(names, imps.tolist()), key=lambda x: x[1], reverse=True)
+            metrics["feature_importances"] = {name: round(imp, 6) for name, imp in paired}
+            metrics["feature_importances_top25"] = {name: round(imp, 6) for name, imp in paired[:top_n]}
+
         # Save metrics to JSON
         metrics_path = self.output_dir / f"{model.name}_{split}_metrics.json"
         with open(metrics_path, "w") as fh:
