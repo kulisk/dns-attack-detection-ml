@@ -25,6 +25,9 @@ class SVMDetector(BaseDetector):
         probability: Enable probability estimates (requires cross-validation;
             slower training but enables :meth:`predict_proba`).
         max_iter: Hard limit on training iterations.
+        max_train_samples: If set, stratified-downsample the training set to
+            this many rows before fitting (SVM scales as O(n²)–O(n³)).
+        random_state: Seed for reproducible downsampling.
         model_dir: Persistence directory.
     """
 
@@ -36,9 +39,13 @@ class SVMDetector(BaseDetector):
         class_weight: str = "balanced",
         probability: bool = True,
         max_iter: int = 5000,
+        max_train_samples: Optional[int] = None,
+        random_state: int = 42,
         model_dir: str = "models",
     ) -> None:
         super().__init__(name="svm", model_dir=model_dir)
+        self.max_train_samples = max_train_samples
+        self.random_state = random_state
         self._params = dict(
             kernel=kernel,
             C=C,
@@ -58,6 +65,22 @@ class SVMDetector(BaseDetector):
         X_val: Optional[np.ndarray] = None,
         y_val: Optional[np.ndarray] = None,
     ) -> "SVMDetector":
+        if self.max_train_samples is not None and len(X_train) > self.max_train_samples:
+            rng = np.random.default_rng(self.random_state)
+            # Stratified downsampling: keep class proportions
+            classes, counts = np.unique(y_train, return_counts=True)
+            keep_idx: list[np.ndarray] = []
+            for cls, cnt in zip(classes, counts):
+                cls_idx = np.where(y_train == cls)[0]
+                n_keep = max(1, int(round(self.max_train_samples * cnt / len(y_train))))
+                keep_idx.append(rng.choice(cls_idx, size=min(n_keep, len(cls_idx)), replace=False))
+            idx = np.concatenate(keep_idx)
+            X_train, y_train = X_train[idx], y_train[idx]
+            logger.info(
+                "SVM training set downsampled",
+                extra={"original": len(idx), "downsampled_to": len(X_train)},
+            )
+
         logger.info(
             "Training SVM",
             extra={

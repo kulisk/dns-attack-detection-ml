@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import Optional
 
 import numpy as np
+import torch
 from xgboost import XGBClassifier
 
 from src.models.base_detector import BaseDetector
@@ -26,6 +27,7 @@ class XGBoostDetector(BaseDetector):
         scale_pos_weight: Balances positive/negative weights (binary mode).
         n_jobs: CPU parallelism.
         random_state: Seed.
+        device: Compute device (``"cuda"`` or ``"cpu"``; auto-detected).
         model_dir: Persistence directory.
     """
 
@@ -39,9 +41,11 @@ class XGBoostDetector(BaseDetector):
         scale_pos_weight: float = 1.0,
         n_jobs: int = -1,
         random_state: int = 42,
+        device: Optional[str] = None,
         model_dir: str = "models",
     ) -> None:
         super().__init__(name="xgboost", model_dir=model_dir)
+        _device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self._params = dict(
             n_estimators=n_estimators,
             max_depth=max_depth,
@@ -52,7 +56,7 @@ class XGBoostDetector(BaseDetector):
             n_jobs=n_jobs,
             random_state=random_state,
             eval_metric="mlogloss",
-            use_label_encoder=False,
+            device=_device,
             verbosity=0,
         )
         self._model = XGBClassifier(**self._params)
