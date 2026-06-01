@@ -98,7 +98,7 @@ class DatasetLoader:
             from src.data_collection.synthetic_generator import SyntheticDNSGenerator
             logger.info("Generating synthetic DNS dataset …")
             gen = SyntheticDNSGenerator(random_state=self.random_state)
-            df = gen.generate(n_samples=50_000)
+            df = gen.generate(n_samples=500_000)
         elif self.source == "cic_dns":
             df = self._load_csv_dir()
             df = self._normalise_cic_labels(df)

@@ -29,16 +29,16 @@ ATTACK_TYPES = [
     "botnet_dns",
 ]
 
-# Target class distribution (approx)
+# Equal class distribution — balanced by design, no SMOTE needed
 _CLASS_WEIGHTS = {
-    "benign": 0.50,
-    "dns_ddos": 0.12,
-    "dns_amplification": 0.10,
-    "dns_tunneling": 0.08,
-    "cache_poisoning": 0.05,
-    "nxdomain_attack": 0.07,
-    "data_exfiltration": 0.04,
-    "botnet_dns": 0.04,
+    "benign": 0.125,
+    "dns_ddos": 0.125,
+    "dns_amplification": 0.125,
+    "dns_tunneling": 0.125,
+    "cache_poisoning": 0.125,
+    "nxdomain_attack": 0.125,
+    "data_exfiltration": 0.125,
+    "botnet_dns": 0.125,
 }
 
 

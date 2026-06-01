@@ -58,7 +58,7 @@ feature_engineering:
 
 # ---- Imbalance Handling ----
 imbalance:
-  strategy: "smote"                 # smote | class_weight | none
+  strategy: "none"                  # smote | class_weight | none
   sampling_strategy: "auto"
   k_neighbors: 5
 
